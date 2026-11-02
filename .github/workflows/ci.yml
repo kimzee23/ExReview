@@ -29,3 +29,5 @@ jobs:
         run: uv run python -c "from exreview.main import app; print('ExReview application loaded successfully')"
         env:
           PYTHONPATH: src
+      - name: Run tests
+        run: uv run pytest

@@ -8,5 +8,5 @@ app = FastAPI(
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World",
+    return {"message": "Welcome to ExReview API",
             "status": "Application is running"}
