@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from exreview.main import app
+from fastapi.exceptions import RequestValidationError
 
 client = TestClient(app)
 
