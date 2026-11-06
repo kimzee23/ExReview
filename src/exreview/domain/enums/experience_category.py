@@ -1,0 +1,10 @@
+from enum import StrEnum
+
+
+class ExperienceCategory(StrEnum):
+    COMMUNICATION = "COMMUNICATION"
+    TRUST = "TRUST"
+    BOUNDARIES = "BOUNDARIES"
+    COMPATIBILITY = "COMPATIBILITY"
+    PERSONAL_GROWTH = "PERSONAL_GROWTH"
+    OTHER = "OTHER"

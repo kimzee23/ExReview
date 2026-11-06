@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, String, Uuid, func
+from sqlalchemy import Boolean, DateTime, Index, String, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from exreview.infrastructure.database.base import Base
@@ -20,6 +20,11 @@ class UserModel(Base):
         String(255),
         unique=True,
         nullable=False
+    )
+
+    username: Mapped[str | None] = mapped_column(
+        String(30),
+        nullable=True,
     )
 
     password_hash: Mapped[str] = mapped_column(
@@ -43,3 +48,10 @@ class UserModel(Base):
         server_default=func.now(),
         nullable=False
     )
+
+
+Index(
+    "uq_users_username_lower",
+    func.lower(UserModel.username),
+    unique=True,
+)

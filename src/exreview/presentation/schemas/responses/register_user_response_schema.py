@@ -10,6 +10,7 @@ class RegisterUserResponseSchema(BaseModel):
 
     id: UUID
     email: str
+    username: str | None
     display_name: str
     is_active: bool
     created_at: datetime

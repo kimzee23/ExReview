@@ -17,3 +17,17 @@ class UserRepository(ABC):
     @abstractmethod
     def find_by_email(self, email: str) -> User | None:
         pass
+
+
+    @abstractmethod
+    def find_by_username(self, username: str) -> User | None:
+        pass
+
+    @abstractmethod
+    def search_by_username(
+            self,
+            username: str,
+            page: int,
+            page_size: int,
+    ) -> tuple[list[User], int]:
+        pass

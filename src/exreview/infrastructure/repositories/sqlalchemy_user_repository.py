@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from exreview.application.ports.user_repository import UserRepository
 from exreview.domain.entities.user import User
 from exreview.infrastructure.models.user_model import UserModel
+from sqlalchemy import func, select
 
 
 class SQLAlchemyUserRepository(UserRepository):
@@ -21,6 +22,7 @@ class SQLAlchemyUserRepository(UserRepository):
             self.session.add(existing_user)
 
         existing_user.email = user.email
+        existing_user.username = user.username
         existing_user.password_hash = user.password_hash
         existing_user.display_name = user.display_name
         existing_user.is_active = user.is_active
@@ -55,13 +57,63 @@ class SQLAlchemyUserRepository(UserRepository):
 
         return self._to_entity(user_model)
 
+
+    def find_by_username(self, username: str) -> User | None:
+        statement = select(UserModel).where(
+            func.lower(UserModel.username) == username.lower()
+        )
+        user_model = self.session.scalar(statement)
+
+        return self._to_entity(user_model) if user_model else None
+
     @staticmethod
     def _to_entity(user_model: UserModel) -> User:
         return User(
             id=user_model.id,
             email=user_model.email,
+            username=user_model.username,
             password_hash=user_model.password_hash,
             display_name=user_model.display_name,
             is_active=user_model.is_active,
-            created_at=user_model.created_at
+            created_at=user_model.created_at,
         )
+
+    def search_by_username(
+            self,
+            username: str,
+            page: int,
+            page_size: int,
+    ) -> tuple[list[User], int]:
+
+        normalized_username = username.strip().lower()
+
+        conditions = (
+            UserModel.is_active.is_(True),
+            UserModel.username.is_not(None),
+            func.lower(UserModel.username).contains(
+                normalized_username,
+                autoescape=True,
+            ),
+        )
+
+        statement = (
+            select(UserModel)
+            .where(*conditions)
+            .order_by(UserModel.username.asc())
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+        )
+
+        count_statement = (
+            select(func.count())
+            .select_from(UserModel)
+            .where(*conditions)
+        )
+
+        user_models = self.session.scalars(statement).all()
+        total = self.session.scalar(count_statement) or 0
+
+        return [
+            self._to_entity(user)
+            for user in user_models
+        ], total

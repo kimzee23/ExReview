@@ -11,3 +11,4 @@ class User:
     display_name: str
     is_active: bool
     created_at: datetime
+    username: str| None = None

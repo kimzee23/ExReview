@@ -13,7 +13,11 @@ from exreview.domain.entities.user import User
 from exreview.domain.exceptions.user_already_exists import (
     UserAlreadyExistsError,
 )
+from exreview.domain.exceptions.username_already_exists import (
+    UsernameAlreadyExistsError,
+)
 from exreview.domain.validators.password_validator import validate_password
+from exreview.domain.validators.username_validator import normalize_username
 
 
 class RegisterUserService:
@@ -32,36 +36,38 @@ class RegisterUserService:
     ) -> RegisterUserResponse:
 
         email = request.email.strip().lower()
+        username = normalize_username(request.username)
 
-        # Check whether the email is already registered.
         existing_user = self.user_repository.find_by_email(email)
 
         if existing_user is not None:
             raise UserAlreadyExistsError(email)
 
-        # Validate the password against our domain rules.
+        existing_username = self.user_repository.find_by_username(username)
+
+        if existing_username is not None:
+            raise UsernameAlreadyExistsError(username)
+
         validate_password(request.password)
 
-        # Hash the password before storing it.
         password_hash = self.password_hasher.hash(request.password)
 
-        # Create the domain entity.
         user = User(
             id=uuid4(),
             email=email,
+            username=username,
             password_hash=password_hash,
             display_name=request.display_name.strip(),
             is_active=True,
             created_at=datetime.now(timezone.utc),
         )
 
-        # Persist the user.
         saved_user = self.user_repository.save(user)
 
-        # Return the registration response.
         return RegisterUserResponse(
             id=saved_user.id,
             email=saved_user.email,
+            username=saved_user.username,
             display_name=saved_user.display_name,
             is_active=saved_user.is_active,
             created_at=saved_user.created_at,

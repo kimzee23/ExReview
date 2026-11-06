@@ -26,3 +26,5 @@ class ErrorMessage(StrEnum):
     INVALID_ACCESS_TOKEN = "Authentication credentials are invalid or expired."
 
     INVALID_REFRESH_TOKEN = "Refresh token is invalid, expired, or revoked."
+
+    USERNAME_ALREADY_EXISTS = "Username already exists."

@@ -24,6 +24,7 @@ from exreview.domain.exceptions.invalid_refresh_token import ( InvalidRefreshTok
 
 from fastapi.responses import JSONResponse
 from fastapi import status
+from exreview.presentation.routers.experience_router import router as experience_router
 
 
 app = FastAPI(
@@ -38,6 +39,7 @@ async def root():
             "status": "Application is running"}
 
 app.include_router(user_router)
+app.include_router(experience_router)
 
 app.add_exception_handler(
     UserAlreadyExistsError,

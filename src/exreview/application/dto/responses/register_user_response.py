@@ -7,6 +7,7 @@ from uuid import UUID
 class RegisterUserResponse:
     id: UUID
     email: str
+    username: str | None
     display_name: str
     is_active: bool
     created_at: datetime

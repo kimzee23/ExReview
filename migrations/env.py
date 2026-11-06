@@ -7,6 +7,7 @@ from exreview.infrastructure.config.settings import get_settings
 from exreview.infrastructure.database.base import Base
 from exreview.infrastructure.models.refresh_token_model import RefreshTokenModel
 from exreview.infrastructure.models.user_model import UserModel
+from exreview.infrastructure.models.experience_model import ExperienceModel
 
 
 # this is the Alembic Config object, which provides
