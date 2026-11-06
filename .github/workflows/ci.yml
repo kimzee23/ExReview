@@ -1,4 +1,3 @@
-
 name: ExReview CI
 
 on:
@@ -11,6 +10,24 @@ jobs:
   test:
     name: Run project checks
     runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/exreview_test
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: exreview_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d exreview_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout repository
@@ -29,5 +46,9 @@ jobs:
         run: uv run python -c "from exreview.main import app; print('ExReview application loaded successfully')"
         env:
           PYTHONPATH: src
+
+      - name: Run database migrations
+        run: uv run alembic upgrade head
+
       - name: Run tests
         run: uv run pytest
